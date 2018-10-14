@@ -1,0 +1,28 @@
+<html>
+<head><title> Yang websocket! </title></head>
+<body>
+	<h1> Welcome to the Yang's Test page </h1>
+	<br>
+	<h2><span id="connected">0</span> 
+        users are on this page right now.</h2>
+
+    <script type="text/javascript" 
+                src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var url = 'https://' + document.domain + ':' + location.port;
+            var socket = io.connect(url);
+            console.log(url);
+	    socket.on('connect', function(msg) {
+                console.log('test');
+		console.log(msg);
+                $("#connected").html(msg.count);
+	    
+            });
+        });
+    </script>
+</body>
+</html>
+
