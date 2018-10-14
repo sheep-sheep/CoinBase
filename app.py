@@ -1,31 +1,52 @@
-import redis
-from gevent import monkey
-monkey.patch_all()
+# import redis
+# from gevent import monkey
+# monkey.patch_all()
 
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
-db = redis.StrictRedis('localhost', 6379, 0)
+# db = redis.StrictRedis('localhost', 6379, 0)
 socketio = SocketIO(app)
 
 @app.route('/localhost')
 def main():
+	print('logger is working')
 	return render_template('main.html')
 
 
-@socketio.on('connect')
-def ws_conn():
-	c = db.incr('user_count')
-	print('connecting', c)
-	socketio.emit('msg', {'count': c})
+@socketio.on('message', namespace='/localhost')
+def handle_message(message):
+    app.logger.info('received message: ' + message)
 
+@socketio.on('json',namespace='/localhost')
+def handle_json(json):
+    app.logger.info('received json: ' + str(json))
 
-@socketio.on('disconnect')
-def ws_disconn():
-        c = db.decr('user_count')
-	print('disconnecting', c)
-        socketio.emit('msg', {'count': c})
+@socketio.on('my event')
+def handle_my_custom_event(json):
+    print('my event', json)
+    app.logger.info('received json: ' + str(json))
+    return 'event test', 0
+
+@socketio.on('my event', namespace='/test')
+def handle_my_custom_namespace_event(json):
+    print('my custom event', json)
+    app.logger.info('received json with namespace /test: ' + str(json))
+    return 'event test', 1
+
+# @socketio.on('connect')
+# def ws_conn():
+# 	c = db.incr('user_count')
+# 	print('connecting', c)
+# 	socketio.emit('msg', {'count': c})
+# 
+# 
+# @socketio.on('disconnect')
+# def ws_disconn():
+#         c = db.decr('user_count')
+# 	print('disconnecting', c)
+#         socketio.emit('msg', {'count': c})
 
 
 if __name__ == '__main__':

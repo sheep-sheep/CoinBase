@@ -1,1 +1,2 @@
-flask-socketio
+flask-socket
+eventlet
